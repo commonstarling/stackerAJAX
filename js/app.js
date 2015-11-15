@@ -80,13 +80,54 @@ var getUnanswered = function(tags) {
 		});
 };
 
+// takes a string of semi-colon separated tags to be searched
+// for on StackOverflow
+var getInspiration = function(tags) {
+	
+	// the parameters we need to pass in our request to StackOverflow's API
+	var request = { tag: tags,
+					site: 'stackoverflow',
+					period: 'all_time'};
+	
+	$.ajax({
+		url: "http://api.stackexchange.com/2.2/tags/{tag}/top-answerers",
+		data: request,
+		dataType: "jsonp",//use jsonp to avoid cross origin issues
+		type: "GET",
+		})
+		.done(function(result){ //this waits for the ajax to return with a successful promise object
+			var searchResults = showSearchResults(request.user, result.items.length);
+			console.log(searchResults);
 
-$(document).ready( function() {
-	$('.unanswered-getter').submit( function(){
+			$('.search-results').html(searchResults);
+			//$.each is a higher order function. It takes an array and a function as an argument.
+			//The function is executed once for each item in the array.
+			$.each(result.items, function(i, item) {
+				var question = showQuestion(item);
+				$('.results').append(question);
+			});
+		})
+		.fail(function(jqXHR, error){ //this waits for the ajax to return with an error promise object
+			var errorElem = showError(error);
+			$('.search-results').append(errorElem);
+		});
+};
+
+
+$(function() {
+	$('.unanswered-getter').submit(function(){
 		// zero out results if previous search has run
 		$('.results').html('');
 		// get the value of the tags the user submitted
 		var tags = $(this).find("input[name='tags']").val();
 		getUnanswered(tags);
+	});
+
+		$('.inspiration-getter').submit(function(){
+		// zero out results if previous search has run
+		$('.results').html('');
+		// get the value of the tags the user submitted
+		var tags = $(this).find("input[name='tags']").val();
+		getInspiration(tags);
 	});
 });
