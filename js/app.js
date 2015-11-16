@@ -32,6 +32,23 @@ var showQuestion = function(question) {
 	return result;
 };
 
+var showAnswerer = function(question) {
+	
+	// clone our result template code
+	var result = $('.templates .top-answerers').clone();
+	
+	// Set the question properties in result
+	var answerer = result.find('.answerer-name');
+	answerer.html('<p>Name: <a target="_blank" '+
+						 'href=http://stackoverflow.com/users/' + result.items.user.user_id + ' >' +
+							result.items.user.display_name +
+						'</a>' +
+				'</p>' +
+				'<p>Reputation: ' + items.user.reputation + '</p>'
+	);
+	return result;
+};
+
 
 // this function takes the results object from StackOverflow
 // and returns the number of results and tags to be appended to DOM
@@ -80,31 +97,27 @@ var getUnanswered = function(tags) {
 		});
 };
 
-// takes a string of semi-colon separated tags to be searched
-// for on StackOverflow
-var getInspiration = function(tags) {
+var getAnswerer = function(tags) {
 	
 	// the parameters we need to pass in our request to StackOverflow's API
-	var request = { tag: tags,
-					site: 'stackoverflow',
-					period: 'all_time'};
+	var request = { tagged: tags,
+					site: 'stackoverflow'};
 	
 	$.ajax({
-		url: "http://api.stackexchange.com/2.2/tags/{tag}/top-answerers",
+		url: "http://api.stackexchange.com/2.2/tags/" + request.tagged + "/top-answerers/all_time?",
 		data: request,
 		dataType: "jsonp",//use jsonp to avoid cross origin issues
 		type: "GET",
 		})
 		.done(function(result){ //this waits for the ajax to return with a successful promise object
-			var searchResults = showSearchResults(request.user, result.items.length);
-			console.log(searchResults);
+			var searchResults = showSearchResults(request.tagged, result.items.length);
 
 			$('.search-results').html(searchResults);
 			//$.each is a higher order function. It takes an array and a function as an argument.
 			//The function is executed once for each item in the array.
 			$.each(result.items, function(i, item) {
-				var question = showQuestion(item);
-				$('.results').append(question);
+				var answerer = showAnswerer(item);
+				$('.results').append(answerer);
 			});
 		})
 		.fail(function(jqXHR, error){ //this waits for the ajax to return with an error promise object
@@ -127,7 +140,7 @@ $(function() {
 		// zero out results if previous search has run
 		$('.results').html('');
 		// get the value of the tags the user submitted
-		var tags = $(this).find("input[name='tags']").val();
-		getInspiration(tags);
+		var tags = $(this).find("input[name='answerers']").val();
+		getAnswerer(tags);
 	});
 });
