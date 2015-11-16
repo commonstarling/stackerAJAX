@@ -22,7 +22,7 @@ var showQuestion = function(question) {
 	// set some properties related to asker
 	var asker = result.find('.asker');
 	asker.html('<p>Name: <a target="_blank" '+
-						 'href=http://stackoverflow.com/users/' + question.owner.user_id + ' >' +
+						 'href=http://stackoverflow.com/users/' + question.owner.user_id + '>' +
 							question.owner.display_name +
 						'</a>' +
 				'</p>' +
@@ -32,7 +32,7 @@ var showQuestion = function(question) {
 	return result;
 };
 
-var showAnswerer = function(question) {
+var showAnswerer = function(items) {
 	
 	// clone our result template code
 	var result = $('.templates .top-answerers').clone();
@@ -40,10 +40,10 @@ var showAnswerer = function(question) {
 	// Set the question properties in result
 	var answerer = result.find('.answerer-name');
 	answerer.html('<p>Name: <a target="_blank" '+
-						 'href=http://stackoverflow.com/users/' + result.items.user.user_id + ' >' +
-							result.items.user.display_name +
+						 'href=http://stackoverflow.com/users/' + items.user.user_id + '>' +
+							items.user.display_name +
 						'</a>' +
-				'</p>' +
+				'</p>' + "<img src=" + items.user.profile_image + "/>" +
 				'<p>Reputation: ' + items.user.reputation + '</p>'
 	);
 	return result;
